@@ -20,6 +20,10 @@ class ProdutoAdapter (private var pessoaList: MutableList<Produto>, val lerGtin:
         }
     }
 
+    fun update() {
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount() = pessoaList.size
 
     override fun onBindViewHolder(holder: ProdutoViewHolder, position: Int) {

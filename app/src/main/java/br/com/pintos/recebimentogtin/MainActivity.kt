@@ -1,5 +1,6 @@
 package br.com.pintos.recebimentogtin
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -7,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -25,9 +27,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
-        edtKeyNF.setText("43190490445206000118550010006994441008942812")
+        edtKeyNF.setText("")
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(edtKeyNF.windowToken, 0)
         edtKeyNF.setOnKeyListener { v, keyCode, event ->
-            if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 val key = edtKeyNF.text.toString()
                 val call = service.findNotaEntrada(key)
                 call.enqueue(object : Callback<NotaEntrada> {
@@ -51,7 +55,28 @@ class MainActivity : AppCompatActivity() {
                                     val key = edtKeyNF.text.toString()
                                     val prdno = prd.codigo
                                     val grade = prd.grade
-                                    service.saveProduto(key, prdno, grade, gtin)
+                                    prd.gtin = gtin
+                                    val call = service.saveProduto(key, prdno, grade, gtin)
+                                    produtoAdapter.update()
+                                    call.enqueue(object : Callback<Messagem> {
+                                        override fun onFailure(call: Call<Messagem>, t: Throwable) {
+                                            Log.e("onFailure error", t.message)
+                                            showErro("Erro de conexão: ${t.message}")
+                                        }
+
+                                        override fun onResponse(
+                                            call: Call<Messagem>,
+                                            response: Response<Messagem>
+                                        ) {
+                                            val messagem = response.body()
+                                            if (messagem != null) {
+                                                if (messagem.erro != "")
+                                                    showErro(messagem.erro)
+                                                else if (messagem.aviso != "")
+                                                    showErro(messagem.aviso)
+                                            }
+                                        }
+                                    })
                                 }
                             }
                             recyclerView.adapter = produtoAdapter
@@ -69,16 +94,16 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle("Erro")
         builder.setMessage(msg)
         builder.create()
-                .show()
+            .show()
     }
 
     fun showConfirma(msg: String, execConfirma: () -> Unit) {
         AlertDialog.Builder(this)
-                .setMessage(msg)
-                .setNegativeButton("Não") { dialogInterface, i -> }
-                .setPositiveButton("Sim") { dialogInterface, i -> execConfirma() }
-                .create()
-                .show()
+            .setMessage(msg)
+            .setNegativeButton("Não") { dialogInterface, i -> }
+            .setPositiveButton("Sim") { dialogInterface, i -> execConfirma() }
+            .create()
+            .show()
     }
 
     fun withEditText(view: View, produto: Produto, processaGtin: (String) -> Unit) {
