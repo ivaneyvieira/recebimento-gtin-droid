@@ -28,30 +28,46 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
         edtKeyNF.setText("")
+        edtKeyNF.setupClearButtonWithAction { value ->
+            if (value.isNullOrBlank()) {
+                txtNumeroNF.text = ""
+                txtData.text = ""
+                txtForn.text = ""
+                listaProduto.clear()
+                produtoAdapter = ProdutoAdapter(listaProduto) { view, prd ->
+                    lerGtin(view, prd)
+                }
+                recyclerView.adapter = produtoAdapter
+            }
+        }
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(edtKeyNF.windowToken, 0)
 
         edtKeyNF.setOnKeyListener { v, keyCode, event ->
             if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 val key = edtKeyNF.text.toString()
-                service.findNotaEntrada(key).execute(this) { nota ->
-                    if (nota == null)
-                        showErro(this@MainActivity, "Nota não encontrada")
-                    else {
-                        txtNumeroNF.text = "${nota.numero}/${nota.serie}"
-                        txtData.text = nota.dataEmissao.toString()
-                        txtForn.text = nota.fornecedor
-                        listaProduto.clear()
-                        listaProduto.addAll(nota.produtos)
-                        produtoAdapter = ProdutoAdapter(listaProduto) { view, prd ->
-                            lerGtin(view, prd)
-                        }
-                        recyclerView.adapter = produtoAdapter
-                    }
-
-                }
+                processaKey(key)
                 true
             } else false
+        }
+    }
+
+    private fun processaKey(key: String) {
+        service.findNotaEntrada(key).execute(this) { nota ->
+            if (nota == null)
+                showErro(this@MainActivity, "Nota não encontrada")
+            else {
+                txtNumeroNF.text = "${nota.numero}/${nota.serie}"
+                txtData.text = nota.dataEmissao.toString()
+                txtForn.text = nota.fornecedor
+                listaProduto.clear()
+                listaProduto.addAll(nota.produtos)
+                produtoAdapter = ProdutoAdapter(listaProduto) { view, prd ->
+                    lerGtin(view, prd)
+                }
+                recyclerView.adapter = produtoAdapter
+            }
+
         }
     }
 
@@ -64,12 +80,10 @@ class MainActivity : AppCompatActivity() {
             produtoAdapter.update()
             service.saveProduto(key, prdno, grade, gtin).execute(this@MainActivity) { messagem ->
                 if (messagem != null) {
-                    if (messagem.erro != "")
-                        showErro(this@MainActivity, messagem.erro)
-                    else if (messagem.aviso != "")
-                        showErro(this@MainActivity, messagem.aviso)
-                    else {
-                        proximoProduto(prd)?.let{prdProximo ->
+                    when {
+                        messagem.erro != "" -> showErro(this@MainActivity, messagem.erro)
+                        messagem.aviso != "" -> showErro(this@MainActivity, messagem.aviso)
+                        else -> proximoProduto(prd)?.let { prdProximo ->
                             lerGtin(view, prdProximo)
                         }
                     }
@@ -109,6 +123,9 @@ class MainActivity : AppCompatActivity() {
             } else false
         }
         builder.setView(dialogLayout)
+        builder.setNegativeButton("Cancelar") { dialog, which ->
+            dialog.dismiss()
+        }
         builder.setPositiveButton("OK") { _, _ ->
             val gtin = editText.text.toString()
             processaGtin(gtin)

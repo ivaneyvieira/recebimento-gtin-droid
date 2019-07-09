@@ -28,6 +28,7 @@ class ProdutoAdapter(private var pessoaList: MutableList<Produto>, val lerGtin: 
         private val txtGrade = itemView.txtGrade
         private val txtGtin = itemView.txtGtin
         private val txtNome = itemView.txtNome
+        private val txtQuant = itemView.txtQuant
         private var produto: Produto? = null
 
         init {
@@ -42,6 +43,7 @@ class ProdutoAdapter(private var pessoaList: MutableList<Produto>, val lerGtin: 
             txtGrade.text = produto.grade
             txtGtin.text = produto.gtin
             txtNome.text = produto.descricao
+            txtQuant.text = produto.quant.toString()
         }
     }
 
