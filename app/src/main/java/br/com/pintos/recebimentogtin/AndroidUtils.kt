@@ -17,16 +17,16 @@ fun showErro(context: Context, msg: String) {
     builder.setTitle("Erro")
     builder.setMessage(msg)
     builder.create()
-        .show()
+            .show()
 }
 
 fun showConfirma(context: Context, msg: String, execConfirma: () -> Unit) {
     AlertDialog.Builder(context)
-        .setMessage(msg)
-        .setNegativeButton("Não") { _, _ -> }
-        .setPositiveButton("Sim") { _, _ -> execConfirma() }
-        .create()
-        .show()
+            .setMessage(msg)
+            .setNegativeButton("Não") { _, _ -> }
+            .setPositiveButton("Sim") { _, _ -> execConfirma() }
+            .create()
+            .show()
 }
 
 fun <T> Call<T>.execute(context: Context, lambda: (T?) -> Unit) {
@@ -43,7 +43,6 @@ fun <T> Call<T>.execute(context: Context, lambda: (T?) -> Unit) {
 }
 
 fun EditText.setupClearButtonWithAction(changText: (String?) -> Unit) {
-
     addTextChangedListener(object : TextWatcher {
         override fun afterTextChanged(editable: Editable?) {
             val clearIcon = if (editable?.isNotEmpty() == true) R.drawable.abc_ic_clear_material else 0
@@ -65,4 +64,14 @@ fun EditText.setupClearButtonWithAction(changText: (String?) -> Unit) {
         }
         return@OnTouchListener false
     })
+}
+
+fun Int.toDate(): String {
+    val txt = this.toString()
+    return if (txt.length == 8) {
+        val dia = txt.substring(6, 8)
+        val mes = txt.substring(4, 6)
+        val ano = txt.substring(0, 4)
+        "$dia/$mes/$ano"
+    } else ""
 }

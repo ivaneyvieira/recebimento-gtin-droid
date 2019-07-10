@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 showErro(this@MainActivity, "Nota não encontrada")
             else {
                 txtNumeroNF.text = "${nota.numero}/${nota.serie}"
-                txtData.text = nota.dataEmissao.toString()
+                txtData.text = nota.dataEmissao.toDate()
                 txtForn.text = nota.fornecedor
                 listaProduto.clear()
                 listaProduto.addAll(nota.produtos)
@@ -67,23 +67,24 @@ class MainActivity : AppCompatActivity() {
                 }
                 recyclerView.adapter = produtoAdapter
             }
-
         }
     }
 
     private fun lerGtin(view: View, prd: Produto) {
-        withEditText(view, prd) { gtin ->
+        withEditText(view, prd) { dialog, gtin ->
             val key = edtKeyNF.text.toString()
             val prdno = prd.codigo
             val grade = prd.grade
             prd.gtin = gtin
             produtoAdapter.update()
-            service.saveProduto(key, prdno, grade, gtin).execute(this@MainActivity) { messagem ->
+            val gtinNull = if (gtin.isBlank()) "NULL" else gtin
+            service.saveProduto(key, prdno, grade, gtinNull).execute(this@MainActivity) { messagem ->
                 if (messagem != null) {
                     when {
                         messagem.erro != "" -> showErro(this@MainActivity, messagem.erro)
                         messagem.aviso != "" -> showErro(this@MainActivity, messagem.aviso)
                         else -> proximoProduto(prd)?.let { prdProximo ->
+                            dialog?.dismiss()
                             lerGtin(view, prdProximo)
                         }
                     }
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
     }
 
-    fun withEditText(view: View, produto: Produto, processaGtin: (String) -> Unit) {
+    fun withEditText(view: View, produto: Produto, processaGtin: (AlertDialog?, String) -> Unit) {
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
         var dialog: AlertDialog? = null
@@ -114,21 +115,23 @@ class MainActivity : AppCompatActivity() {
         val editText = dialogLayout.findViewById<EditText>(R.id.editText)
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(editText.windowToken, 0)
+
         editText.setOnKeyListener { v, keyCode, event ->
             if ((event.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 val gtin = editText.text.toString()
-                processaGtin(gtin)
-                dialog?.dismiss()
+                if (gtin != "")
+                    processaGtin(dialog, gtin)
                 true
             } else false
         }
+
         builder.setView(dialogLayout)
         builder.setNegativeButton("Cancelar") { dialog, which ->
             dialog.dismiss()
         }
         builder.setPositiveButton("OK") { _, _ ->
             val gtin = editText.text.toString()
-            processaGtin(gtin)
+            processaGtin(dialog, gtin)
         }
         dialog = builder.show()
     }

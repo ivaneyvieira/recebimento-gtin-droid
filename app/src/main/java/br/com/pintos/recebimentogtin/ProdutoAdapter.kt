@@ -1,13 +1,14 @@
 package br.com.pintos.recebimentogtin
 
 import android.support.v7.widget.RecyclerView
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.produto_item.view.*
 
 class ProdutoAdapter(private var pessoaList: MutableList<Produto>, val lerGtin: (View, Produto) -> Unit) :
-    RecyclerView.Adapter<ProdutoAdapter.ProdutoViewHolder>() {
+        RecyclerView.Adapter<ProdutoAdapter.ProdutoViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProdutoViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.produto_item, parent, false)
         return ProdutoViewHolder(view, lerGtin)

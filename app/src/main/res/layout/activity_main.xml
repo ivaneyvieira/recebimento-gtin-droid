@@ -15,25 +15,39 @@
                 android:text="Chave da nota fiscal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/textView"/>
+
         <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/edtKeyNF"/>
+            android:id="@+id/edtKeyNF"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textSize="12sp" />
         <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/pnlNota">
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/txtNumeroNF" android:layout_weight="1"/>
+                android:id="@+id/txtNumeroNF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/txtData" android:layout_weight="1"/>
+                android:id="@+id/txtData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/txtForn" android:layout_weight="2"/>
+                android:id="@+id/txtForn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textSize="12sp" />
         </LinearLayout>
         <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
