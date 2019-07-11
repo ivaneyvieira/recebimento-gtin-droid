@@ -74,9 +74,7 @@ class MainActivity : AppCompatActivity() {
         withEditText(view, prd) { dialog, gtin ->
             val key = edtKeyNF.text.toString()
             val prdno = prd.codigo
-            val grade = prd.grade
-            prd.gtin = gtin
-            produtoAdapter.update()
+            val grade = prd.grade.replace("/", "_")
             val gtinNull = if (gtin.isBlank()) "NULL" else gtin
             service.saveProduto(key, prdno, grade, gtinNull).execute(this@MainActivity) { messagem ->
                 if (messagem != null) {
@@ -84,6 +82,8 @@ class MainActivity : AppCompatActivity() {
                         messagem.erro != "" -> showErro(this@MainActivity, messagem.erro)
                         messagem.aviso != "" -> showErro(this@MainActivity, messagem.aviso)
                         else -> proximoProduto(prd)?.let { prdProximo ->
+                            prd.gtin = gtin
+                            produtoAdapter.update()
                             dialog?.dismiss()
                             lerGtin(view, prdProximo)
                         }
