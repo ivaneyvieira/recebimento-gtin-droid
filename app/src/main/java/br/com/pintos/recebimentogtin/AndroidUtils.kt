@@ -8,70 +8,72 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 fun showErro(context: Context, msg: String) {
-    val builder = AlertDialog.Builder(context)
-    builder.setTitle("Erro")
-    builder.setMessage(msg)
-    builder.create()
-            .show()
+  val builder = AlertDialog.Builder(context)
+  builder.setTitle("Erro")
+  builder.setMessage(msg)
+  builder.create()
+    .show()
 }
 
 fun showConfirma(context: Context, msg: String, execConfirma: () -> Unit) {
-    AlertDialog.Builder(context)
-            .setMessage(msg)
-            .setNegativeButton("Não") { _, _ -> }
-            .setPositiveButton("Sim") { _, _ -> execConfirma() }
-            .create()
-            .show()
+  AlertDialog.Builder(context)
+    .setMessage(msg)
+    .setNegativeButton("Não") {_, _ ->}
+    .setPositiveButton("Sim") {_, _ -> execConfirma()}
+    .create()
+    .show()
 }
 
 fun <T> Call<T>.execute(context: Context, lambda: (T?) -> Unit) {
-    this.enqueue(object : Callback<T?> {
-        override fun onFailure(call: Call<T?>?, t: Throwable?) {
-            Log.e("onFailure error", t?.message)
-            showErro(context, "Erro de conexão: ${t?.message}")
-        }
+  this.enqueue(object: Callback<T?> {
+    override fun onFailure(call: Call<T?>?, t: Throwable?) {
+      Log.e("onFailure error", t?.message)
+      Toast.makeText(context, t?.message, Toast.LENGTH_SHORT).show()
+    }
 
-        override fun onResponse(call: Call<T?>, response: Response<T?>?) {
-            lambda(response?.body())
-        }
-    })
+    override fun onResponse(call: Call<T?>, response: Response<T?>?) {
+      lambda(response?.body())
+    }
+  })
 }
 
 fun EditText.setupClearButtonWithAction(changText: (String?) -> Unit) {
-    addTextChangedListener(object : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-            val clearIcon = if (editable?.isNotEmpty() == true) R.drawable.abc_ic_clear_material else 0
-            setCompoundDrawablesWithIntrinsicBounds(0, 0, clearIcon, 0)
-        }
+  addTextChangedListener(object: TextWatcher {
+    override fun afterTextChanged(editable: Editable?) {
+      val clearIcon = if(editable?.isNotEmpty() == true) R.drawable.abc_ic_clear_material else 0
+      setCompoundDrawablesWithIntrinsicBounds(0, 0, clearIcon, 0)
+    }
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            changText(s?.toString())
-        }
-    })
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+      changText(s?.toString())
+    }
+  })
 
-    setOnTouchListener(View.OnTouchListener { _, event ->
-        if (event.action == MotionEvent.ACTION_UP) {
-            if (event.rawX >= (this.right - this.compoundPaddingRight)) {
-                this.setText("")
-                return@OnTouchListener true
-            }
-        }
-        return@OnTouchListener false
-    })
+  setOnTouchListener(View.OnTouchListener {_, event ->
+    if(event.action == MotionEvent.ACTION_UP) {
+      if(event.rawX >= (this.right - this.compoundPaddingRight)) {
+        this.setText("")
+        return@OnTouchListener true
+      }
+    }
+    return@OnTouchListener false
+  })
 }
 
 fun Int.toDate(): String {
-    val txt = this.toString()
-    return if (txt.length == 8) {
-        val dia = txt.substring(6, 8)
-        val mes = txt.substring(4, 6)
-        val ano = txt.substring(0, 4)
-        "$dia/$mes/$ano"
-    } else ""
+  val txt = this.toString()
+  return if(txt.length == 8) {
+    val dia = txt.substring(6, 8)
+    val mes = txt.substring(4, 6)
+    val ano = txt.substring(0, 4)
+    "$dia/$mes/$ano"
+  }
+  else ""
 }

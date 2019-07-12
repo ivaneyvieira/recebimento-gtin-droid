@@ -1,7 +1,9 @@
 package br.com.pintos.recebimentogtin
 
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface GtinService {
@@ -14,17 +16,9 @@ interface GtinService {
       key: String
   ): Call<NotaEntrada>
 
-  @GET("/save/{key}/{prdno}/{grade}/{gtin}")
-  fun saveProduto(
-      @Path("key")
-      key: String,
-      @Path("prdno")
-      prdno: String,
-      @Path("grade")
-      grade: String,
-      @Path("gtin")
-      gtin: String
-  ): Call<Messagem>
+  @POST("/saveProduto")
+  fun saveProduto(@Body
+                  produto : Produto): Call<Messagem>
 }
 
 data class NotaEntrada(

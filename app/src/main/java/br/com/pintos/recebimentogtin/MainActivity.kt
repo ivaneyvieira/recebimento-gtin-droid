@@ -72,11 +72,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun lerGtin(view: View, prd: Produto) {
         withEditText(view, prd) { dialog, gtin ->
-            val key = edtKeyNF.text.toString()
-            val prdno = prd.codigo
-            val grade = prd.grade.replace("/", "_")
-            val gtinNull = if (gtin.isBlank()) "NULL" else gtin
-            service.saveProduto(key, prdno, grade, gtinNull).execute(this@MainActivity) { messagem ->
+            val produto = prd.copy(gtin = gtin)
+
+            service.saveProduto(produto).execute(this@MainActivity) { messagem ->
                 if (messagem != null) {
                     when {
                         messagem.erro != "" -> showErro(this@MainActivity, messagem.erro)
