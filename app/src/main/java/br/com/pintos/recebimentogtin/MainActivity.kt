@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
         var dialog: AlertDialog? = null
-        builder.setTitle("GTIN ${produto.codigo} ${produto.grade}")
+        builder.setTitle("${produto.codigo} ${produto.descricao} ${produto.grade}")
         val dialogLayout = inflater.inflate(R.layout.alert_dialog_with_edittext, null)
         val editText = dialogLayout.findViewById<EditText>(R.id.editText)
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
