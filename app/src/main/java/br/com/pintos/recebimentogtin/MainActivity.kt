@@ -1,6 +1,7 @@
 package br.com.pintos.recebimentogtin
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -12,12 +13,13 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-//43190490445206000118550010006994441008942812
+//23190789850341001646550110006236241139131145
 class MainActivity : AppCompatActivity() {
     val service = RetrofitInitializer().gtinService()
     lateinit var produtoAdapter: ProdutoAdapter
@@ -108,7 +110,12 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
         var dialog: AlertDialog? = null
-        builder.setTitle("${produto.codigo} ${produto.descricao} ${produto.grade}")
+        val title = TextView(this)
+        title.text = "${produto.descricao}\n${produto.grade}"
+        title.typeface = Typeface.DEFAULT_BOLD
+        title.textSize = 15f
+        builder.setCustomTitle(title)
+
         val dialogLayout = inflater.inflate(R.layout.alert_dialog_with_edittext, null)
         val editText = dialogLayout.findViewById<EditText>(R.id.editText)
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
