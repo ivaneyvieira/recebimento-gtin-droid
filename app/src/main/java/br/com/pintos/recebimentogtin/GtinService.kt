@@ -34,6 +34,7 @@ data class NotaEntrada(
 
 data class Produto(
     val codigo: String,
+    val referencia : String,
     val descricao: String,
     val quant: Int,
     val grade: String,

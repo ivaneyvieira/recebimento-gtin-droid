@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         val inflater = layoutInflater
         var dialog: AlertDialog? = null
         val title = TextView(this)
-        title.text = "${produto.descricao}\n${produto.grade}"
+        title.text = "${produto.referencia}\n${produto.descricao}\n${produto.grade}"
         title.typeface = Typeface.DEFAULT_BOLD
         title.textSize = 15f
         builder.setCustomTitle(title)
